@@ -1,0 +1,104 @@
+---
+title: "Hex Logo"
+output: html_document
+date: "2023-10-15"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Logo update
+
+From time to time we might choose to update our logo. Here some nifty code to do that. 
+
+Check out the inspiration for this project [here](https://www.r-bloggers.com/2023/06/how-to-generate-a-hex-sticker-with-openai-and-cropcircles/)
+
+## Required Packages
+
+```{r}
+# install.packages("cropcircles")
+# install.packages("showtext")
+# install.packages("tidyverse")
+# install.packages("ggpath")
+# install.packages("ggtext")
+# install.packages("glue")
+# install.packages("ggstream")
+```
+
+## Choose a font from Google Font
+
+```{r}
+library(showtext)
+font_add_google("Bangers", "bangers")
+font_add_google("Roboto", "rob")
+showtext_auto()
+ft <- "bangers"
+ft1 <- "rob"
+txt <- "black"
+
+# fontawesome fonts (optional - this adds the git logo - download from https://fontawesome.com/)
+# font_add("fa-brands", regular = "fonts/fontawesome-free-6.2.0-web/webfonts/fa-brands-400.ttf")
+```
+
+
+<!-- # package name and githu repo -->
+<!-- pkg_name <- "dumpster\nFire" -->
+<!-- git_name <- "doehm/dumpsterFire" -->
+
+## Graph for logo
+```{r}
+library(ggplot2)
+library(ggstream)
+# Create data:
+set.seed(787)
+data <- data.frame(
+  year=rep(seq(1990,2016) , each=10),
+  name=rep(letters[1:10] , 27),
+  value=sample( seq(0,1,0.0001) , 270)
+)
+ 
+
+ggplot(data, aes(x = year, y = value, color =value,
+      fill = name)) +
+  # geom_stream()
+   geom_stream(position = "identity",extra_span = 0.013, type = "ridge", n_grid = 3000, bw = .78)
+  
+  # geom_stream(geom = "contour", color = "white", bw = 0.45) + # Controls smoothness
+  # geom_stream(geom = "polygon", bw = .45) 
+
+
+
+```
+
+## Cropping our image
+```{r}
+library(cropcircles)
+img_cropped <- hex_crop(
+  images = x$data$url,
+  border_colour = "#107e54",
+  border_size = 24
+)
+```
+
+
+```{r}
+library(tidyverse)
+library(ggpath)
+library(ggtext)
+library(glue)
+ggplot() +
+  geom_from_path(aes(0.5, 0.5, path = img_cropped)) +
+  # package name
+  annotate("text", x = 0.5, y = 0.25, label = pkg_name, family = ft, size = 34,
+           fontface = "bold", colour = txt, angle = 22, hjust = 0, lineheight = 0.25) +
+  # add github - remove if not wanted
+  annotate("richtext", x=0.46, y = 0.07, family = ft1, size = 10, angle = 15, colour = txt, hjust = 0,
+           label = glue("<span style='font-family:fa-brands; color:{txt}'> </span> {git_name}"),
+           label.color = NA, fill = NA) +
+  xlim(0, 1) +
+  ylim(0, 1) +
+  theme_void() +
+  coord_fixed()
+ggsave("images/hex-dumpster-fire.png", height = 6, width = 6)
+```
