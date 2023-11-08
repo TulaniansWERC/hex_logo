@@ -58,17 +58,29 @@ data <- data.frame(
   value=sample( seq(0,1,0.0001) , 270)
 )
  
+# Define the color palette
+pal <- c("#FFB400",
+  "#C20008",
+  "#13AFEF",
+  "#8E038E", 
+  "#595A52")
 
 ggplot(data, aes(x = year, y = value, color =value,
       fill = name)) +
-  # geom_stream()
-   geom_stream(position = "identity",extra_span = 0.013, type = "ridge", n_grid = 3000, bw = .78)
-  
-  # geom_stream(geom = "contour", color = "white", bw = 0.45) + # Controls smoothness
+   geom_stream() 
+  #  geom_stream(extra_span = 0.013, type = "ridge", n_grid = 3000, bw = .78) +
+  scale_color_manual(
+    expand = c(0, 0),
+    values = pal,
+    guide = "none"
+  ) +
+  scale_fill_manual(
+    values = pal,
+    name = NULL
+  )
+
+# geom_stream(geom = "contour", color = "white", bw = 0.45) + # Controls smoothness
   # geom_stream(geom = "polygon", bw = .45) 
-
-
-
 ```
 
 ## Cropping our image
